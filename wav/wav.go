@@ -2,14 +2,23 @@ package wav
 
 import (
 	"bytes"
+	"context"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log/slog"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
+
+	"github.com/mdobak/go-xerrors"
+
+	"song-recognition/models"
+	"song-recognition/utils"
 )
 
 // WavHeader defines the structure of a WAV header

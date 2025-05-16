@@ -64,6 +64,7 @@ func request(endpoint string) (int, string, error) {
 	req.Header.Add("Authorization", "Bearer "+bearer)
 
 	resp, err := (&http.Client{}).Do(req)
+	fmt.Println("resp", resp.Body)
 	if err != nil {
 		return 0, "", fmt.Errorf("error on getting response: %w", err)
 	}
@@ -73,6 +74,8 @@ func request(endpoint string) (int, string, error) {
 	if err != nil {
 		return 0, "", fmt.Errorf("error on reading response: %w", err)
 	}
+
+
 
 	return resp.StatusCode, string(body), nil
 }
@@ -89,6 +92,7 @@ func isValidPattern(url, pattern string) bool {
 }
 
 func TrackInfo(url string) (*Track, error) {
+	fmt.Println("url", url)
 	trackPattern := `^https:\/\/open\.spotify\.com\/track\/[a-zA-Z0-9]{22}\?si=[a-zA-Z0-9]{16}$`
 	if !isValidPattern(url, trackPattern) {
 		return nil, errors.New("invalid track url")

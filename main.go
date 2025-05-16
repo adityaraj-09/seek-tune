@@ -30,7 +30,7 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		fmt.Println("Expected 'find', 'download', 'erase', 'save', or 'serve' subcommands")
+		fmt.Println("Expected 'find', 'download', 'erase', 'save', 'process-json', or 'serve' subcommands")
 		os.Exit(1)
 	}
 
@@ -68,8 +68,15 @@ func main() {
 		}
 		filePath := indexCmd.Arg(0)
 		save(filePath, *force)
+	case "process-json":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: main.go process-json <path_to_json_file>")
+			os.Exit(1)
+		}
+		jsonPath := os.Args[2]
+		processSongFromJSON(jsonPath)
 	default:
-		fmt.Println("Expected 'find', 'download', 'erase', 'save', or 'serve' subcommands")
+		fmt.Println("Expected 'find', 'download', 'erase', 'save', 'process-json', or 'serve' subcommands")
 		os.Exit(1)
 	}
 }

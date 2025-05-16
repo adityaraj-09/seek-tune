@@ -77,34 +77,41 @@ func LowPassFilter(cutoffFrequency, sampleRate float64, input []float64) []float
 
 // Downsample downsamples the input audio from originalSampleRate to targetSampleRate
 func Downsample(input []float64, originalSampleRate, targetSampleRate int) ([]float64, error) {
-	if targetSampleRate <= 0 || originalSampleRate <= 0 {
-		return nil, errors.New("sample rates must be positive")
-	}
-	if targetSampleRate > originalSampleRate {
-		return nil, errors.New("target sample rate must be less than or equal to original sample rate")
-	}
+    // Validate input parameters
+    if targetSampleRate <= 0 || originalSampleRate <= 0 {
+        return nil, errors.New("sample rates must be positive")
+    }
+    if targetSampleRate > originalSampleRate {
+        return nil, errors.New("target sample rate must be less than or equal to original sample rate")
+    }
 
-	ratio := originalSampleRate / targetSampleRate
-	if ratio <= 0 {
-		return nil, errors.New("invalid ratio calculated from sample rates")
-	}
+    // Calculate the ratio of original to target sample rate
+    ratio := originalSampleRate / targetSampleRate
+    if ratio <= 0 {
+        return nil, errors.New("invalid ratio calculated from sample rates")
+    }
 
-	var resampled []float64
-	for i := 0; i < len(input); i += ratio {
-		end := i + ratio
-		if end > len(input) {
-			end = len(input)
-		}
+    // Pre-allocate the output slice with the expected size
+    expectedSize := len(input) / ratio
+    resampled := make([]float64, 0, expectedSize)
 
-		sum := 0.0
-		for j := i; j < end; j++ {
-			sum += input[j]
-		}
-		avg := sum / float64(end-i)
-		resampled = append(resampled, avg)
-	}
+    // Perform downsampling by averaging samples
+    for i := 0; i < len(input); i += ratio {
+        end := i + ratio
+        if end > len(input) {
+            end = len(input)
+        }
 
-	return resampled, nil
+        // Calculate average of samples in current window
+        sum := 0.0
+        for j := i; j < end; j++ {
+            sum += input[j]
+        }
+        avg := sum / float64(end-i)
+        resampled = append(resampled, avg)
+    }
+
+    return resampled, nil
 }
 
 type Peak struct {

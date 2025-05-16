@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"song-recognition/db"
 	"song-recognition/shazam"
+	"song-recognition/song"
 	"song-recognition/spotify"
 	"song-recognition/utils"
 	"song-recognition/wav"
@@ -78,6 +79,7 @@ func find(filePath string) {
 }
 
 func download(spotifyURL string) {
+
 	err := utils.CreateFolder(SONGS_DIR)
 	if err != nil {
 		err := xerrors.New(err)
@@ -102,6 +104,7 @@ func download(spotifyURL string) {
 	}
 
 	if strings.Contains(spotifyURL, "track") {
+		fmt.Println("spotifyURL", spotifyURL)
 		_, err := spotify.DlSingleTrack(spotifyURL, SONGS_DIR)
 		if err != nil {
 			yellow.Println("Error: ", err)
@@ -321,4 +324,28 @@ func saveSong(filePath string, force bool) error {
 	}
 
 	return nil
+}
+
+func processSongFromJSON(jsonPath string) {
+	logger := utils.GetLogger()
+	ctx := context.Background()
+
+	// Read the JSON file
+	jsonData, err := os.ReadFile(jsonPath)
+	if err != nil {
+		logger.ErrorContext(ctx, "Failed to read JSON file", slog.Any("error", err))
+		return
+	}
+
+	// Process the song
+	response, err := song.ProcessSongJSON(jsonData)
+	if err != nil {
+		logger.ErrorContext(ctx, "Failed to process song", slog.Any("error", err))
+		return
+	}
+
+	// Print the response
+	fmt.Printf("Song processed successfully:\n")
+	fmt.Printf("  File path: %s\n", response.FilePath)
+	fmt.Printf("  Fingerprint ID: %s\n", response.FingerprintID)
 }
